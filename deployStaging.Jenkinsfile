@@ -76,13 +76,14 @@ pipeline {
                  // Get IP of service
                     env.SERVICE_IP = "ace-box"
                     env.SERVICE_PORT = "31500"
+                    // env.SERVICE_PORT = sh(script: 'kubectl -n staging get svc ${APP_NAME} -o \'jsonpath={.spec.ports[0].nodePort}\'', , returnStdout: true).trim()
                     }
                 }
                 container("curl") {
                 script {
                     def status = dt_createUpdateSyntheticTest (
                         testName : "sockshop.dev.${env.APP_NAME}",
-                     url : "http://${SERVICE_IP}:{$SERVICE_PORT}/items",
+                    url : "http://${SERVICE_IP}:{$SERVICE_PORT}/api",
                     method : "GET",
                     location : "SYNTHETIC_LOCATION-D26C605813B99ABD"
                     )
