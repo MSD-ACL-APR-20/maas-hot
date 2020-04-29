@@ -67,6 +67,32 @@ pipeline {
                 }
             }
         }
+
+        // Reference https://github.com/dynatrace-ace-sockshop/carts/blob/master/Jenkinsfile
+        stage('DT create synthetic monitor') {
+            steps {
+                container("kubectl") {
+                 script {
+                 // Get IP of service
+                    env.SERVICE_IP = "ace-box"
+                    env.SERVICE_PORT = "31500"
+                    }
+                }
+                container("curl") {
+                script {
+                    def status = dt_createUpdateSyntheticTest (
+                        testName : "sockshop.dev.${env.APP_NAME}",
+                     url : "http://${SERVICE_IP}:{$SERIVCE_PORT}/items",
+                    method : "GET",
+                    location : "SYNTHETIC_LOCATION-D26C605813B99ABD"
+                    )
+                }
+            }
+        }
+
+        //stage('DT Create Application Detection Rule') {}
+        //stage('DT Create Management Zone') {}
+
         stage('Run tests') {
             steps {
                 build job: "3. Test",
