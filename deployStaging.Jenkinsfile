@@ -83,7 +83,7 @@ pipeline {
                 script {
                     def status = dt_createUpdateSyntheticTest (
                         testName : "sockshop.dev.${env.APP_NAME}",
-                    url : "http://${SERVICE_IP}:{$SERVICE_PORT}/api",
+                    url : "http://${SERVICE_IP}:{$SERVICE_PORT}/api/invoke",
                     method : "GET",
                     location : "SYNTHETIC_LOCATION-D26C605813B99ABD"
                     )
