@@ -20,15 +20,17 @@ pipeline {
         label 'kubegit'
     }
     
-        stage('DT send stop test event') {
+
+    stages {
+        stage('DT send Start test event') {
             steps {
              container("curl") {
                 script {
                 def status = pushDynatraceInfoEvent (
                     tagRule : tagMatchRules,
                     source: "JMeter",
-                    description: "Finished JMeter Perf Test",
-                    title: "JMeter Stop Perf Test",
+                    description: "Starting JMeter Perf Test",
+                    title: "JMeter Start Perf Test",
                     customProperties : [
                         [key: 'Jenkins Build Number', value: "${env.BUILD_ID}"],
                         [key: 'Git commit', value: "${env.GIT_COMMIT}"]
@@ -39,7 +41,6 @@ pipeline {
             }
         }
 
-    stages {
         stage('Run performance test') {
             steps {
                 checkout scm
@@ -66,15 +67,15 @@ pipeline {
             }
         }
 
-        stage('DT send start test event') {
+        stage('DT send stop test event') {
             steps {
              container("curl") {
                 script {
                 def status = pushDynatraceInfoEvent (
                     tagRule : tagMatchRules,
                     source: "JMeter",
-                    description: "Starting JMeter Perf Test",
-                    title: "JMeter Start Perf Test",
+                    description: "Stopping JMeter Perf Test",
+                    title: "JMeter Stop Perf Test",
                     customProperties : [
                         [key: 'Jenkins Build Number', value: "${env.BUILD_ID}"],
                         [key: 'Git commit', value: "${env.GIT_COMMIT}"]
