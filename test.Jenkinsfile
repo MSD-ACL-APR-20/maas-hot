@@ -1,5 +1,17 @@
 @Library('ace@master') _ 
 
+def tagMatchRules = [
+  [
+    "meTypes": [
+      ["meType": "SERVICE"]
+    ],
+    tags : [
+      ["context": "CONTEXTLESS", "key": "app", "value": "simplenodeservice"],
+      ["context": "CONTEXTLESS", "key": "environment", "value": "staging"]
+    ]
+  ]
+]
+
 pipeline {
     parameters {
         string(name: 'APP_NAME', defaultValue: 'simplenodeservice', description: 'The name of the service to deploy.', trim: true)
@@ -7,6 +19,26 @@ pipeline {
     agent {
         label 'kubegit'
     }
+    
+        stage('DT send stop test event') {
+            steps {
+             container("curl") {
+                script {
+                def status = pushDynatraceInfoEvent (
+                    tagRule : tagMatchRules,
+                    source: "JMeter",
+                    description: "Finished JMeter Perf Test",
+                    title: "JMeter Stop Perf Test",
+                    customProperties : [
+                        [key: 'Jenkins Build Number', value: "${env.BUILD_ID}"],
+                        [key: 'Git commit', value: "${env.GIT_COMMIT}"]
+                        ]
+                    )
+                    }
+                }
+            }
+        }
+
     stages {
         stage('Run performance test') {
             steps {
@@ -29,6 +61,25 @@ pipeline {
                         currentBuild.result = 'FAILED'
                         error "Performance test in staging failed."
                     }
+                    }
+                }
+            }
+        }
+
+        stage('DT send start test event') {
+            steps {
+             container("curl") {
+                script {
+                def status = pushDynatraceInfoEvent (
+                    tagRule : tagMatchRules,
+                    source: "JMeter",
+                    description: "Starting JMeter Perf Test",
+                    title: "JMeter Start Perf Test",
+                    customProperties : [
+                        [key: 'Jenkins Build Number', value: "${env.BUILD_ID}"],
+                        [key: 'Git commit', value: "${env.GIT_COMMIT}"]
+                        ]
+                    )
                     }
                 }
             }

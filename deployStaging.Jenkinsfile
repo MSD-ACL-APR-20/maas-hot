@@ -1,3 +1,5 @@
+@Library('ace@master') _ 
+
 def tagMatchRules = [
   [
     "meTypes": [
@@ -65,51 +67,12 @@ pipeline {
                 }
             }
         }
-
-        stage('DT send start test event') {
-            steps {
-             container("curl") {
-                script {
-                def status = pushDynatraceInfoEvent (
-                    tagRule : tagMatchRules,
-                    source: "JMeter",
-                    description: "Starting JMeter Perf Test",
-                    title: "JMeter Start Perf Test",
-                    customProperties : [
-                        [key: 'Jenkins Build Number', value: "${env.BUILD_ID}"],
-                        [key: 'Git commit', value: "${env.GIT_COMMIT}"]
-                        ]
-                    )
-                    }
-                }
-            }
-        }
-
         stage('Run tests') {
             steps {
                 build job: "3. Test",
                 parameters: [
                     string(name: 'APP_NAME', value: "${env.APP_NAME}")
                 ]
-            }
-        }
-
-        stage('DT send stop test event') {
-            steps {
-             container("curl") {
-                script {
-                def status = pushDynatraceInfoEvent (
-                    tagRule : tagMatchRules,
-                    source: "JMeter",
-                    description: "Finished JMeter Perf Test",
-                    title: "JMeter Stop Perf Test",
-                    customProperties : [
-                        [key: 'Jenkins Build Number', value: "${env.BUILD_ID}"],
-                        [key: 'Git commit', value: "${env.GIT_COMMIT}"]
-                        ]
-                    )
-                    }
-                }
             }
         }  
     }
