@@ -87,6 +87,7 @@ pipeline {
                     location : "SYNTHETIC_LOCATION-D26C605813B99ABD"
                     )
                 }
+                }
             }
         }
 
